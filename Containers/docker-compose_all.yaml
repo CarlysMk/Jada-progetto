@@ -1,0 +1,29 @@
+services:
+
+    mariadb:
+        image: 'mysql-v1:v1.1' 
+        container_name: mysql-v1.1        
+        environment:
+                 MYSQL_ROOT_PASSWORD: qwe123
+        volumes:
+           -  "C:\\database\\mysql\\init.sql:/docker-entrypoint-initdb.d/init.sql"           
+           -  "C:\\database\\mysql\\data\\mysql:/var/lib/mysql:Z"
+        ports:
+            - '3306:3306'
+        build:
+            dockerfile: DockerfileMysql
+        restart: unless-stopped
+        
+        
+    stmqtt:
+        image: stmqtt_v1.8:v1.8
+        build:
+            dockerfile: DockerfileMQTT
+        ports:
+            - "1885:1883"
+            - "9005:9001"
+        volumes:
+            - "C:\\mosquitto\\data:/mosquitto/data"
+            - "C:\\mosquitto\\config\\mosquitto.conf:/mosquitto/config/mosquitto.conf"
+        restart: unless-stopped
+

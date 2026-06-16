@@ -1,0 +1,17 @@
+services:
+
+    mariadb:
+        image: 'mysql-v1:v1.1' 
+        container_name: mysql-v1.1        
+        environment:
+                 MYSQL_ROOT_PASSWORD: qwe123
+        volumes:
+           -  "C:\\database\\mysql\\init.sql:/docker-entrypoint-initdb.d/init.sql"           
+           -  "C:\\database\\mysql\\data\\mysql:/var/lib/mysql:Z"
+        ports:
+            - '3368:3306'
+        build:
+            dockerfile: DockerfileMysql
+        restart: 'on-failure'
+        
+
