@@ -104,7 +104,6 @@ export default function TabellaUtenti() {
             <TableCell sx={{ color: '#bdbdbd' }}>Fine</TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}>Durata</TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}>Descrizione</TableCell>
-            <TableCell sx={{ color: '#bdbdbd' }}>Ticket</TableCell>
           </TableRow>
           <TableRow>
             <TableCell sx={{ color: '#bdbdbd' }}><SelezioneStato /></TableCell>
@@ -117,7 +116,6 @@ export default function TabellaUtenti() {
             <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
-            <TableCell sx={{ color: '#bdbdbd' }}></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -135,7 +133,6 @@ export default function TabellaUtenti() {
               <TableCell sx={{ color: 'white' }}>{allarmi.dataFine}</TableCell>
               <TableCell sx={{ color: 'white' }}>{allarmi.durata}</TableCell>
               <TableCell sx={{ color: 'white' }}>{allarmi.descrizione}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.ticket}</TableCell>
             </TableRow>
           ))}
         </TableBody>
