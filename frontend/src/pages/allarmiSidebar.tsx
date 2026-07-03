@@ -77,9 +77,6 @@ export default function AllarmiSidebar ({ open, onClose, allarmi, selectedDate, 
                             <Typography sx={{ color: '#6b7280', fontSize: 11}}>
                                 {a.dataInizio}{a.dataFine ? ` ${a.dataFine}` : ' in corso'}
                             </Typography>
-                            {a.ticket && (
-                                <Typography sx={{ color: '#6b7280', fontSize: 11, mt: 0.5 }}>{a.ticket}</Typography>
-                            )}
                         </Box>
                     ))
                     }

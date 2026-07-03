@@ -12,5 +12,4 @@ export interface Allarme {
     dataFine?: string;
     durata?: string;
     descrizione: string;
-    ticket?: string;
 }
