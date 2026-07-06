@@ -105,6 +105,7 @@ export default function TabellaUtenti() {
             <TableCell sx={{ color: '#bdbdbd' }}>Durata</TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}>Descrizione</TableCell>
           </TableRow>
+          
           <TableRow>
             <TableCell sx={{ color: '#bdbdbd' }}><SelezioneStato /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
@@ -112,8 +113,8 @@ export default function TabellaUtenti() {
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><SelezioneLivello /></TableCell>
-            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell>
-            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell>
+            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell> {/*formattaData(allarme.dataInizio) // "13:03 - 05/07/2026"*/}
+            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell> {/*formattaOra(punto.timestamp) // "13:03" <- questo potrebbe servire nel grafico*/}
             <TableCell sx={{ color: '#bdbdbd' }}></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
           </TableRow>

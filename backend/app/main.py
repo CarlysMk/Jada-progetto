@@ -2,7 +2,7 @@ import logging
 
 from fastapi import FastAPI
 
-from app.routers import alarms
+from app.routers import alarms, production
 from app.services.jada_client import jada_client
 
 logging.basicConfig(level=logging.INFO)
@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.INFO)
 app = FastAPI(title="Impianto Fotovoltaico - Backend")
 
 app.include_router(alarms.router)
+app.include_router(production.router)
 
 
 @app.on_event("startup")
