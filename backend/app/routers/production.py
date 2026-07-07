@@ -14,7 +14,7 @@ router= APIRouter(prefix="/production", tags=["production"])
 
 @router.get("", response_model=list[ProduzionePunto])
 def get_production(
-    date: date_type = Query(..., description="Giorno di riferimento"),
+    date: date_type = Query(..., description="Giorno di riferimento, in formato YYYY-MM-DD"),
     resolution: str = Query("day", pattern="^(day|week)"),
 ):
     return production_service.get_production(date=date, resolution=resolution)

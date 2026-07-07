@@ -1,6 +1,7 @@
-import { Link, Route, Routes } from "react-router"
+import 'devextreme/dist/css/dx.light.css';
+import { Navigate, Route, Routes } from "react-router"
 import GraficoUtenti from "./pages/grafico"
-import  Home from "./pages/home"
+import  Banner from "./pages/Banner"
 import TabellaUtenti from "./pages/tabella"
 
 export default function App() {
@@ -8,9 +9,9 @@ export default function App() {
   return (
    <main>
     <div className="bg-gray-800">
-      <Home />
+      <Banner />
         <Routes>
-          <Route path="/" element={<Link to="/tabella" replace />} />
+          <Route path="/" element={<Navigate to="/tabella" replace />} />
           <Route path="/tabella" element = {<TabellaUtenti />} />
           <Route path="/grafico" element = {<GraficoUtenti />} />
         </Routes>

@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class ProduzionePunto(BaseModel):
-    timestamp: str
+    data: str
     produzione: float | None
-    produzioneStima: float | None
+    produzionestima: float | None
     

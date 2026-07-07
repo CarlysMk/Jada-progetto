@@ -1,4 +1,4 @@
-export type Livello = 'Minor' | 'Warning' | 'Major'
+export type Livello = 'Minor' | 'Warning' | 'Major';
 
 export interface Allarme {
     id: number;
@@ -9,7 +9,7 @@ export interface Allarme {
     dispositivo: string;
     livello: Livello;
     dataInizio: string;
-    dataFine?: string;
-    durata?: string;
+    dataFine?: string | null;
+    durata?: string | null;
     descrizione: string;
 }

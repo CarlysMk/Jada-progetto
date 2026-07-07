@@ -1,8 +1,9 @@
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Box, TextField, Stack, IconButton,
+  CircularProgress, Alert,
 } from '@mui/material';
-import { allarmiMock } from '../data/mock';
+import { useEffect, useState } from 'react';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -13,9 +14,33 @@ import GenericaRicerca from '../util/genericaRicerca';
 import SelezioneLivello from '../util/selezioneLivello';
 import BasicDatePicker from '../util/BasicDatePicker';
 import CambioBot from '../util/cambiobot';
+import { getAllarmi } from '../api/client';
+import type { Allarme } from '../types/allarme';
+import { formattaData } from '../util/formattaData';
 
 export default function TabellaUtenti() {
+  const [allarmi, setAllarmi] = useState<Allarme[]>([]);
+  const [caricamento, setCaricamento] = useState(true);
+  const [errore, setErrore] = useState<string | null> (null);
 
+  useEffect(() => {
+    let annullato = false;
+
+    getAllarmi()
+      .then((dati) => {
+        if (!annullato) setAllarmi(dati);
+      })
+      .catch((err) => {
+        if (!annullato) setErrore(err.message);
+      })
+      .finally(() => {
+        if (!annullato) setCaricamento(false);
+      });
+
+    return () => {
+      annullato = true;
+    };
+  }, []);
  
   return (
     <>
@@ -81,7 +106,12 @@ export default function TabellaUtenti() {
 
     </Stack>
 
-    
+    {errore && (
+      <Alert severity='error' sx={{ mx: 4, mt:2}}>
+        Impossibile caricare gli allarmi: {errore}
+      </Alert>
+    )}
+
     <TableContainer>
       <Table sx={{border: '1px solid', 
                   borderColor: '#424242', 
@@ -113,29 +143,37 @@ export default function TabellaUtenti() {
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><SelezioneLivello /></TableCell>
-            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell> {/*formattaData(allarme.dataInizio) // "13:03 - 05/07/2026"*/}
-            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell> {/*formattaOra(punto.timestamp) // "13:03" <- questo potrebbe servire nel grafico*/}
+            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell>
+            <TableCell sx={{ color: '#bdbdbd' }}><BasicDatePicker /></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}></TableCell>
             <TableCell sx={{ color: '#bdbdbd' }}><GenericaRicerca /></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {allarmiMock.map((allarmi) => (
-            <TableRow className='bg-gray-800'
-              key={allarmi.id}
-            >
-              <TableCell>{allarmi.stato ?  <ReportProblemRoundedIcon className='text-amber-500'/> : <ReportProblemRoundedIcon className='text-gray-400' />}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.impianto}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.azienda}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.gruppo}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.dispositivo}</TableCell>
-              <TableCell sx={{ color: 'white' }}><ReportProblemRoundedIcon />{allarmi.livello}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.dataInizio}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.dataFine}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.durata}</TableCell>
-              <TableCell sx={{ color: 'white' }}>{allarmi.descrizione}</TableCell>
+          {caricamento ? (
+            <TableRow>
+              <TableCell colSpan={10} align='center' sx={{ py: 4}}>
+                <CircularProgress size={28} />
+              </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            allarmi.map((allarme) => (
+              <TableRow className='bg-gray-800'
+                key={allarme.id}
+              >
+                <TableCell>{allarme.stato ?  <ReportProblemRoundedIcon className='text-amber-500'/> : <ReportProblemRoundedIcon className='text-gray-400' />}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{allarme.impianto}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{allarme.azienda}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{allarme.gruppo}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{allarme.dispositivo}</TableCell>
+                <TableCell sx={{ color: 'white' }}><ReportProblemRoundedIcon />{allarme.livello}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{formattaData(allarme.dataInizio)}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{formattaData(allarme.dataFine)}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{allarme.durata ?? '-'}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{allarme.descrizione}</TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </TableContainer>

@@ -3,13 +3,19 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import type {SelectChangeEvent}  from '@mui/material/Select'
+import type {SelectChangeEvent}  from '@mui/material/Select';
 
-export default function SelezioneTempo() {
-  const [stato, setStato] = React.useState('giornaliero');
+export type FrequenzaVisualizzazione = 'giornaliero' | 'settimanale';
+
+type Props = {
+  value: FrequenzaVisualizzazione;
+  onChange: (value: FrequenzaVisualizzazione) => void;
+}
+
+export default function SelezioneTempo( { value, onChange }: Props) {
 
   const handleChange = (event: SelectChangeEvent) => {
-    setStato(event.target.value);
+    onChange(event.target.value as FrequenzaVisualizzazione);
   };
   return (
       <FormControl variant="filled"
@@ -47,7 +53,7 @@ export default function SelezioneTempo() {
         }}
         ></InputLabel>
         <Select
-          value={stato}
+          value={value}
           onChange={handleChange}
           sx={{color: 'white',
             '& .MuiSvgIcon-root': {
@@ -68,8 +74,6 @@ export default function SelezioneTempo() {
             
             <MenuItem value='giornaliero'>Giornaliero</MenuItem>
             <MenuItem value='settimanale'>Settimanale</MenuItem>
-            <MenuItem value='mensile'>Mensile</MenuItem>
-            <MenuItem value='annuale'>Annuale</MenuItem>
         </Select>
       </FormControl>
   );

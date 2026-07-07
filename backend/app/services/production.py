@@ -40,9 +40,9 @@ def get_production(date: date_type, resolution: Risoluzione) -> list[ProduzioneP
 
     return [
         ProduzionePunto(
-            timestamp=punto[campo_argomento],
+            data=punto[campo_argomento],
             produzione=punto.get(campo_reale),
-            produzioneStima=punto.get(campo_stima),
+            produzionestima=punto.get(campo_stima),
         )
         for punto in data_source
     ]

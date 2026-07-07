@@ -1,6 +1,8 @@
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
 from app.routers import alarms, production
 from app.services.jada_client import jada_client
@@ -8,6 +10,17 @@ from app.services.jada_client import jada_client
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="Impianto Fotovoltaico - Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(alarms.router)
 app.include_router(production.router)

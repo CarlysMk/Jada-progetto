@@ -1,66 +1,84 @@
-import { Stack, IconButton } from "@mui/material";
+import { Stack, IconButton, Alert } from "@mui/material";
 import SelezioneTempo from "../util/selezioneTempo";
+import type { FrequenzaVisualizzazione } from "../util/selezioneTempo";
 import BasicDatePicker from "../util/BasicDatePicker";
 import StatoBot from "../util/statobot";
 import CambioBot from "../util/cambiobot";
 import EventIcon from '@mui/icons-material/Event';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import Char from "../util/char";
-import { produzioneMock } from "../data/mockproduzionev2";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
+import utc  from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { AllarmiGrafico } from "./allarmiGrafico";
-import { allarmiMock } from "../data/mock";
 import AllarmiSidebar from "./allarmiSidebar";
-import type { Livello } from "../types/allarme";
+import { getAllarmi, getProduzione } from "../api/client";
+import type { Risoluzione } from "../api/types";
+import type { Allarme, Livello } from "../types/allarme";
+import type { Produzione } from "../types/produzione";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-function parseAlarmDateTime(value: string) {
-    const [time, date] = value.split(' - ');
-    return dayjs(`${date} ${time}`, 'DD/MM/YYYY HH:mm');
-}
+const fusOrario = 'Europe/Rome';
 
-function getAllarmiAtTime(date: Dayjs, time: string) {
-    const clickedDt = dayjs(`${date.format('DD/MM/YYYY')} ${time}`, 'DD/MM/YYYY HH:mm');
-    return allarmiMock.filter(a => {
-        const start = parseAlarmDateTime(a.dataInizio);
-        const end = a.dataFine ? parseAlarmDateTime(a.dataFine) : null;
+const Frequenza_to_Risoluzione: Record<FrequenzaVisualizzazione, Risoluzione> = {
+    giornaliero: 'day',
+    settimanale: 'week',
+};
+
+function getAllarmiAtTime(allarmi: Allarme[], date: Dayjs, time: string) {
+    const clickedDt = dayjs.tz(`${date.format('YYYY-MM-DD')}T${time}:00`, fusOrario);
+
+    return allarmi.filter(a => {
+        const start = dayjs(a.dataInizio).tz(fusOrario);
+        const end = a.dataFine ? dayjs(a.dataFine).tz(fusOrario) : null;
         return start.isBefore(clickedDt) && (end === null || end.isAfter(clickedDt));
   });
 }
 
 export default function GraficoUtenti () {
     const [selectedDate, setSelectedDate] = useState <Dayjs | null> (dayjs());
+    const [frequenza, setFrequenza] = useState<FrequenzaVisualizzazione>('giornaliero');
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [clickedTime, setClickedTime] = useState <string | null> (null);
-    const [allarmiSidebar, setAllarmiSidebar] = useState <typeof allarmiMock> ([]);
     const [livelliFiltro, setLivelliFiltro] = useState<Livello[]>([]);
 
-    const extractDate = (fullString: string) => {
-        return fullString.split(' - ')[1];
-    };
-    const filteredData = produzioneMock.filter(item => {
-        if (!selectedDate) return false;
+    const [allarmi, setAllarmi] = useState<Allarme[]>([]);
+    const [allarmiSidebar, setAllarmiSidebar] = useState<Allarme[]>([]);
 
-        const itemDate = extractDate(item.data);
-        return dayjs(itemDate, "DD/MM/YYYY")
-        .format("YYYY-MM-DD") === selectedDate.format("YYYY-MM-DD");
-    });
+    const [produzione, setProduzione] = useState<Produzione[]>([]);
+    const [erroreProduzione, setErroreProduzione] = useState<string | null>(null);
 
-    const nextDay = selectedDate ? selectedDate.add(1, 'day') : null;
-    const nextDayMidnight = nextDay ? produzioneMock.find(item => 
-        item.data === `00:00 - ${nextDay.format("DD/MM/YYYY")}`
-    )
-    :null;
+    // Allarmi: recuperati una volta sola
+    useEffect(() => {
+        let annullato = false;
+        getAllarmi()
+            .then((dati) => { if (!annullato) setAllarmi(dati); })
+            .catch((err) => { if (!annullato) console.error(err); });
+        return () => {annullato = true; };
+    }, []);
 
-    const chartData = nextDayMidnight 
-    ? [...filteredData, { ...nextDayMidnight, data: `24:00 - ${selectedDate!.format("DD/MM/YYYY")}`}]
-    : filteredData;
+    // Produzione: dipende dal giono selezionato e dalla risoluzione
+    useEffect(() => {
+        if (!selectedDate) return;
+        let annullato = false;
+
+        const risoluzione = Frequenza_to_Risoluzione[frequenza];
+
+        getProduzione(selectedDate.format('YYYY-MM-DD'), risoluzione)
+            .then((dati) => { if (!annullato) setProduzione(dati); })
+            .catch((err) => { if (!annullato) setErroreProduzione(err.message); })
+
+        return () => {annullato = true; };
+    }, [selectedDate, frequenza]);
 
     const handlePointClick = (time: string) => {
         if (!selectedDate) return;
         setClickedTime(time);
-        setAllarmiSidebar(getAllarmiAtTime(selectedDate, time));
+        setAllarmiSidebar(getAllarmiAtTime(allarmi, selectedDate, time));
         setSidebarOpen(true);
     };
 
@@ -73,7 +91,7 @@ export default function GraficoUtenti () {
             <Stack direction="row" spacing={2}
             sx={{ml:'auto', mr:3}}
             >
-                <SelezioneTempo />
+                <SelezioneTempo value={frequenza} onChange={setFrequenza} />
                 <BasicDatePicker 
                 value={selectedDate}
                 onChange={setSelectedDate}
@@ -98,10 +116,16 @@ export default function GraficoUtenti () {
             </Stack>
         </Stack>
 
-        <Char  data={chartData} onPointClick={handlePointClick}/>
+        {erroreProduzione && (
+            <Alert severity="error" sx={{ mx: 4, mt: 2}}>
+                Impossibile caricare la produzione: {erroreProduzione}
+            </Alert>
+        )}
+
+        <Char  data={produzione} onPointClick={handlePointClick}/>
 
         <AllarmiGrafico 
-        allarmi={allarmiMock}
+        allarmi={allarmi}
         selectedDate={selectedDate}
         livelliFiltro={livelliFiltro}
         />

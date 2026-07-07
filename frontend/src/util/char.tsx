@@ -1,7 +1,14 @@
 import Box from '@mui/material/Box';
 import { LineChart } from '@mui/x-charts/LineChart';
 import type { Produzione } from '../types/produzione';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const fusOrario = 'Europe/Rome';
 
 type Props = { 
   data: Produzione[];
@@ -10,10 +17,7 @@ type Props = {
 
 export default function Char({ data, onPointClick }: Props) {
   
-  const xLabels = data.map(i => {
-    const [timePart] = i.data.split(' - ');
-    return timePart;
-  });
+  const xLabels = data.map(i => dayjs(i.data).tz(fusOrario).format('HH:mm'));
 
   const produzione = data.map(i => i.produzione);
 

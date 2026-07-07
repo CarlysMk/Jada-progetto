@@ -11,7 +11,6 @@ Questo client:
 import logging
 
 import httpx
-
 import truststore
 
 from app.config import settings

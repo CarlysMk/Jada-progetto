@@ -1,6 +1,13 @@
 import Box from '@mui/material/Box';
 import type { Allarme, Livello } from '../types/allarme';
 import dayjs, { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const fusOrario = 'Europe/Rome';
 
 type Props = {
     allarmi: Allarme[];
@@ -22,8 +29,7 @@ type AlarmRow = {
 };
 
 function extractDateTime (value: string) {
-    const [time, date] = value.split(' - ');
-    return dayjs(`${date} ${time}`, "DD/MM/YYYY HH:mm");
+    return dayjs(value);
 }
 
 function timeToIndex(time: string): number {
@@ -79,8 +85,8 @@ export function AllarmiGrafico({ allarmi, selectedDate, livelliFiltro }: Props) 
             ? dayEnd
             : end;
 
-            let startIndex = timeToIndex(effectiveStart.format("HH:mm"));
-            let endIndex = timeToIndex(effectiveEnd.format("HH:mm"));
+            let startIndex = timeToIndex(effectiveStart.tz(fusOrario).format("HH:mm"));
+            let endIndex = timeToIndex(effectiveEnd.tz(fusOrario).format("HH:mm"));
 
             startIndex = Math.max(0, Math.min(startIndex, puntiTotali - 1));
             endIndex = Math.max(0, Math.min(endIndex, puntiTotali - 1));
@@ -119,7 +125,7 @@ export function AllarmiGrafico({ allarmi, selectedDate, livelliFiltro }: Props) 
                         borderRadius: 1,
                         overflow: 'hidden',
                         ml: '-30px',  // uguale a yAxis width
-    mr: '24px',
+                        mr: '24px',
                     }}
                     >
                         {row.segments.map((s, i) => {

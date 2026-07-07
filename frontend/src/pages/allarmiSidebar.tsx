@@ -3,6 +3,7 @@ import type { Allarme } from "../types/allarme";
 import { Box, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded';
+import { formattaData } from "../util/formattaData";
 
 type Props = {
     open: boolean;
@@ -75,7 +76,7 @@ export default function AllarmiSidebar ({ open, onClose, allarmi, selectedDate, 
                             </Stack>
                             <Typography sx={{ color: '#9ca3af', fontSize: 12, mb: 0.5 }}>{a.descrizione}</Typography>
                             <Typography sx={{ color: '#6b7280', fontSize: 11}}>
-                                {a.dataInizio}{a.dataFine ? ` ${a.dataFine}` : ' in corso'}
+                                {formattaData(a.dataInizio)}{a.dataFine ? ` ${formattaData(a.dataFine)}` : ' in corso'}
                             </Typography>
                         </Box>
                     ))
