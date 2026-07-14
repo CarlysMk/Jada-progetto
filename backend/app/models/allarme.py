@@ -17,3 +17,8 @@ class AllarmeOut(BaseModel):
     dataFine: str | None
     durata: str | None
     descrizione: str
+
+
+class AllarmiPaginati(BaseModel):
+    items: list[AllarmeOut]
+    total: int

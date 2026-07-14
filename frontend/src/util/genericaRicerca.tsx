@@ -4,10 +4,19 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-export default function GenericaRicerca() {
+type Props = {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+};
+
+export default function GenericaRicerca({ value, onChange, placeholder }: Props) {
     return (
         <Box novalidate autoComplete="off">
         <TextField variant="standard"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
         slotProps={{
           input: {
             startAdornment: (

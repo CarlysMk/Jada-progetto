@@ -5,11 +5,16 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import type {SelectChangeEvent}  from '@mui/material/Select'
 
-export default function SelezioneLivello() {
-  const [livello, setLivello] = React.useState('');
+export type LivelloFiltro = '' | 'tutto' | 'red' | 'orange' | 'yellow';
 
+type Props = {
+  value: LivelloFiltro;
+  onChange: (value: LivelloFiltro) => void;
+};
+
+export default function SelezioneLivello({ value, onChange }: Props) {
   const handleChange = (event: SelectChangeEvent) => {
-    setLivello(event.target.value);
+    onChange(event.target.value as LivelloFiltro);
   };
   return (
     <div>
@@ -25,7 +30,7 @@ export default function SelezioneLivello() {
         }}
         ></InputLabel>
         <Select
-          value={livello}
+          value={value}
           onChange={handleChange}
           disableUnderline
           sx={{color: 'white',
@@ -47,7 +52,7 @@ export default function SelezioneLivello() {
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          <MenuItem value='tuttto'>(TUTTI)</MenuItem>
+          <MenuItem value='tutto'>(TUTTI)</MenuItem>
           <MenuItem value='red'>Major</MenuItem>
           <MenuItem value='orange'>Warning</MenuItem>
           <MenuItem value='yellow'>Minor</MenuItem>

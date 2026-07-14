@@ -50,6 +50,9 @@ export default function Char({ data, onPointClick }: Props) {
           '& .MuiChartsAxis-tick': {
             stroke: 'white !important'
           },
+          '& .MuiChartsLegend-label': {
+            color: 'white !important'
+          },
 
         
 

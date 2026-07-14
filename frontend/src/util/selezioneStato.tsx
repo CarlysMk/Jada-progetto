@@ -5,11 +5,17 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import type {SelectChangeEvent}  from '@mui/material/Select'
 
-export default function SelezioneStato() {
-  const [stato, setStato] = React.useState('');
+export type StatoFiltro = '' | 'tutto' | 'on' | 'off'
+
+type Props = {
+  value: StatoFiltro;
+  onChange: (value: StatoFiltro) => void;
+};
+
+export default function SelezioneStato({ value, onChange }: Props) {
 
   const handleChange = (event: SelectChangeEvent) => {
-    setStato(event.target.value);
+    onChange(event.target.value as StatoFiltro);
   };
   return (
     <div>
@@ -28,7 +34,7 @@ export default function SelezioneStato() {
         }}
         ></InputLabel>
         <Select
-          value={stato}
+          value={value}
           onChange={handleChange}
           disableUnderline
           sx={{color: 'white',

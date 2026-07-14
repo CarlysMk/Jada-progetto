@@ -7,7 +7,8 @@ import CambioBot from "../util/cambiobot";
 import EventIcon from '@mui/icons-material/Event';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
 import Char from "../util/char";
-import { useEffect, useState } from "react";
+import BrushSlider from "../util/brushSlider";
+import { useEffect, useMemo, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import utc  from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -52,11 +53,13 @@ export default function GraficoUtenti () {
     const [produzione, setProduzione] = useState<Produzione[]>([]);
     const [erroreProduzione, setErroreProduzione] = useState<string | null>(null);
 
+    const [zoomRange, setZoomRange] = useState<string | null>(null);
+
     // Allarmi: recuperati una volta sola
     useEffect(() => {
         let annullato = false;
-        getAllarmi()
-            .then((dati) => { if (!annullato) setAllarmi(dati); })
+        getAllarmi({ skip: 0, take: 500 })
+            .then((risultato) => { if (!annullato) setAllarmi(risultato.items); })
             .catch((err) => { if (!annullato) console.error(err); });
         return () => {annullato = true; };
     }, []);
@@ -75,6 +78,31 @@ export default function GraficoUtenti () {
         return () => {annullato = true; };
     }, [selectedDate, frequenza]);
 
+    useEffect(() => {
+        if (produzione.length > 0) {
+            setZoomRange([0, produzione.length - 1]);
+        } else {
+            setZoomRange(null);
+        }
+    }, [produzione]);
+
+    const zoomLabels = useMemo(
+        () => produzione.map(p => dayjs(p.data).tz(fusOrario).format('HH:mm')),
+        [produzione]
+    );
+
+    const zoomedProduzione = useMemo(() => {
+        if (!zoomRange) return produzione;
+        return produzione.slice(zoomRange[0], zoomRange[1] + 1);
+    }, [produzione, zoomRange]);
+
+    const windowStart = zoomRange && produzione[zoomRange[0]]
+        ? dayjs(produzione[zoomRange[0]].data)
+        : null;
+    const windowEnd = zoomRange && produzione[zoomRange[1]]
+        ? dayjs(produzione[zoomRange[1]].data)
+        : null;
+
     const handlePointClick = (time: string) => {
         if (!selectedDate) return;
         setClickedTime(time);
@@ -91,7 +119,7 @@ export default function GraficoUtenti () {
             <Stack direction="row" spacing={2}
             sx={{ml:'auto', mr:3}}
             >
-                <SelezioneTempo value={frequenza} onChange={setFrequenza} />
+                
                 <BasicDatePicker 
                 value={selectedDate}
                 onChange={setSelectedDate}
@@ -122,12 +150,23 @@ export default function GraficoUtenti () {
             </Alert>
         )}
 
-        <Char  data={produzione} onPointClick={handlePointClick}/>
+        <Char  data={zoomedProduzione} onPointClick={handlePointClick}/>
+
+        {zoomRange && (
+            <BrushSlider
+                labels={zoomLabels}
+                value={zoomRange}
+                onChange={setZoomRange}
+            />
+        )}
 
         <AllarmiGrafico 
         allarmi={allarmi}
         selectedDate={selectedDate}
         livelliFiltro={livelliFiltro}
+        windowStart={windowStart}
+        windowEnd={windowEnd}
+        onBarClick={handlePointClick}
         />
         
         <AllarmiSidebar 
